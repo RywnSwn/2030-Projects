@@ -1,0 +1,52 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-bg-muted: var(--color-bg-muted);
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-line: var(--color-line);
+  --color-pastel-1: var(--color-pastel-1);
+  --color-pastel-2: var(--color-pastel-2);
+  --color-pastel-3: var(--color-pastel-3);
+  --color-pastel-4: var(--color-pastel-4);
+  --color-pastel-5: var(--color-pastel-5);
+  --color-pastel-6: var(--color-pastel-6);
+  --color-pastel-7: var(--color-pastel-7);
+  --font-display: var(--font-bricolage), system-ui, sans-serif;
+  --font-body: var(--font-fraunces), Georgia, serif;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--font-body);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* reagraph wraps the canvas in a div that expects to fill its parent. */
+.graph-frame > div {
+  position: absolute;
+  inset: 0;
+}

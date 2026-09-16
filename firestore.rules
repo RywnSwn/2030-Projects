@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isMember() { return request.auth != null; }
+
+    // Live half of each person. Roster is seeded out-of-band; clients only
+    // ever claim (first login, email must match) or edit their own doc.
+    match /people/{personId} {
+      allow read: if isMember();
+      allow create, delete: if false;
+      allow update: if isMember() && (
+        (resource.data.ownerUid == null
+          && request.auth.token.email == resource.data.email
+          && request.resource.data.ownerUid == request.auth.uid)
+        ||
+        (resource.data.ownerUid == request.auth.uid
+          && request.resource.data.ownerUid == request.auth.uid
+          && request.resource.data.email == resource.data.email)
+      );
+    }
+
+    // Private per student.
+    match /homework/{itemId} {
+      allow read, update, delete: if isMember() && resource.data.ownerUid == request.auth.uid;
+      allow create: if isMember() && request.resource.data.ownerUid == request.auth.uid;
+    }
+
+    // Private per student. Most sensitive data on the site.
+    match /gpaEntries/{entryId} {
+      allow read, update, delete: if isMember() && resource.data.ownerUid == request.auth.uid;
+      allow create: if isMember() && request.resource.data.ownerUid == request.auth.uid;
+    }
+
+    // Shared with the whole grade; only the creator edits.
+    match /events/{eventId} {
+      allow read: if isMember();
+      allow create: if isMember() && request.resource.data.createdByUid == request.auth.uid;
+      allow update, delete: if isMember() && resource.data.createdByUid == request.auth.uid;
+    }
+
+    // Shared wall; only the author edits.
+    match /lorePosts/{postId} {
+      allow read: if isMember();
+      allow create: if isMember() && request.resource.data.authorUid == request.auth.uid;
+      allow update, delete: if isMember() && resource.data.authorUid == request.auth.uid;
+      match /reactions/{uid} {
+        allow read: if isMember();
+        allow write: if isMember() && uid == request.auth.uid;
+      }
+    }
+  }
+}

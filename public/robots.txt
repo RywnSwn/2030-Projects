@@ -1,0 +1,3 @@
+# This site holds personal data about real people. Search engines are not welcome.
+User-agent: *
+Disallow: /
