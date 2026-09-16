@@ -1,0 +1,67 @@
+{
+  "generatedAt": "2026-09-16T16:00:13.675Z",
+  "modularity": 0.0628,
+  "communities": {
+    "ethan-chen-aung": 0,
+    "ywn-yamone": 3,
+    "rich-cao": 0,
+    "micca": 0,
+    "irene": 1,
+    "one-one": 1,
+    "diego-flores-gil": 0,
+    "xiao-long-hein": 2,
+    "may-moe-htet": 3,
+    "true": 2,
+    "thant-khine": 0,
+    "jake": 0,
+    "kai-jensen": 0,
+    "bom-jin": 3,
+    "kota-karasawa": 2,
+    "mpk": 0,
+    "thit-lwin": 1,
+    "momo": 2,
+    "lucas": 0,
+    "sandaku-kay-khaing-mon": 2,
+    "thane-thurane-myint": 0,
+    "lin-nadi": 2,
+    "mia-nay": 1,
+    "shin-shin-nay-wun": 1,
+    "joonsung-park": 0,
+    "emily": 1,
+    "ruby": 1,
+    "aiden": 3,
+    "estina": 3,
+    "thwin-aye": 2,
+    "benjy-shaul": 0,
+    "kyal-syn-min-han": 2,
+    "nway-ei-thanthar": 2,
+    "dennis-thu-yine": 0,
+    "bram-van-lokven": 0,
+    "pinky": 1,
+    "erika-yati": 1,
+    "hazel": 3,
+    "you": 0
+  },
+  "communityMeta": [
+    {
+      "index": 0,
+      "size": 15,
+      "colorHex": "#B8EBD0"
+    },
+    {
+      "index": 1,
+      "size": 9,
+      "colorHex": "#CFC5F5"
+    },
+    {
+      "index": 2,
+      "size": 9,
+      "colorHex": "#F7C6CF"
+    },
+    {
+      "index": 3,
+      "size": 6,
+      "colorHex": "#F7E39B"
+    }
+  ]
+}
