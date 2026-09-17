@@ -108,20 +108,30 @@ not. Both are fine because the meta tag is what search engines honour.
 
 ## Hooking up Supabase (turns Phase 4 on)
 
-1. Create a Supabase project. In **Authentication > Providers** enable Google.
-   Use your own Google Cloud OAuth client (consent screen in **Testing**, add
-   all 39 emails as test users) and paste its client id/secret into Supabase.
+The project already exists: **"Site of 2030"** (ref `iuloykbgofvdapqtvwkz`, region
+ap-northeast-2), and `supabase/migrations/20260917000000_people.sql` is already
+applied to it, with all 39 roster rows seeded (emails still null). Do not
+create a second Supabase project for this site; reuse that one. What is left:
+
+1. In [the Supabase dashboard](https://supabase.com/dashboard/project/iuloykbgofvdapqtvwkz),
+   **Authentication > Providers**, enable Google. Use your own Google Cloud
+   OAuth client (consent screen in **Testing**, add all 39 emails as test
+   users) and paste its client id/secret in. Supabase shows the exact
+   callback URL to add in Google Cloud on that same screen.
 2. **Authentication > URL Configuration**: set Site URL to the Pages URL and add
    `https://<user>.github.io/<repo-name>/login/` (and
    `http://localhost:3000/login/`) to Redirect URLs.
-3. **SQL editor**: run `supabase/migrations/20260917000000_people.sql`, then
-   fill the `email` field for each person in `data/people.json`, run
-   `npm run data:seed-sql`, and run the generated `supabase/seed.sql`.
-   Re-run both seed steps whenever an email changes; it is an upsert.
+3. Fill the `email` field for each person in `data/people.json`, run
+   `npm run data:seed-sql`, and run the generated `supabase/seed.sql` against
+   the project above (SQL editor, or the `execute_sql` Supabase MCP tool if
+   available in-session). It is an upsert, safe to re-run any time an email
+   changes.
 4. Repo **Settings > Secrets and variables > Actions > Variables**: add
-   `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (the anon key
-   is public by design; row level security is what protects data). Locally,
-   put the same two in `.env.local`. Push, and sign-in is live.
+   `NEXT_PUBLIC_SUPABASE_URL` = `https://iuloykbgofvdapqtvwkz.supabase.co` and
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY` (from the dashboard's **Settings > API**,
+   or ask a session with the Supabase connector for it; safe to be public,
+   row level security is what actually protects data). Locally, put the same
+   two in `.env.local`. Push, and sign-in is live.
 
 How claiming works: on first login the app calls the `claim_person()` database
 function, which links the Google account (`auth.uid()`) to the one unclaimed
@@ -132,4 +142,4 @@ only their own `bio` and `photo_url` (enforced by RLS plus column grants);
 ## Search engines
 
 `public/robots.txt` disallows everything, every page carries a `noindex`
-meta tag, and Firebase Hosting adds an `X-Robots-Tag` header. Keep it that way.
+meta tag. Keep it that way.
