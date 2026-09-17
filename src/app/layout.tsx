@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Fraunces } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/ui/SiteHeader";
+import { AuthGate } from "@/components/auth/AuthGate";
+import { AuthProvider } from "@/lib/auth";
 import { designTokens } from "@/lib/designTokens";
 
 const bricolage = Bricolage_Grotesque({
@@ -41,8 +43,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${bricolage.variable} ${fraunces.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-bg text-ink">
-        <SiteHeader />
-        <main className="flex-1 flex flex-col">{children}</main>
+        <AuthProvider>
+          <SiteHeader />
+          <main className="flex-1 flex flex-col">
+            <AuthGate>{children}</AuthGate>
+          </main>
+        </AuthProvider>
       </body>
     </html>
   );

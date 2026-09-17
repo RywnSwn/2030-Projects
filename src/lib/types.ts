@@ -28,9 +28,12 @@ export interface CommunitiesFile {
   communityMeta: CommunityMeta[];
 }
 
-/** Live half of a person, stored in Firestore `people/{personId}` (Phase 4+). */
+/**
+ * Live half of a person, stored in the Supabase `people` table (Phase 4+).
+ * Camel-cased view of `PersonRow` in src/lib/supabase.ts.
+ */
 export interface PersonProfile {
-  email: string;
+  email: string | null;
   ownerUid: string | null;
   photoURL: string | null;
   bio: string;
