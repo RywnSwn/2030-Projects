@@ -39,5 +39,5 @@ insert into public.people (id, email) values
   ('pinky', null),
   ('erika-yati', null),
   ('hazel', null),
-  ('you', null)
+  ('you', '30sawr@isyedu.org')
 on conflict (id) do update set email = excluded.email;
