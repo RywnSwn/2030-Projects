@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "npx serve out",
     "lint": "eslint",
+    "pretypecheck": "node scripts/generate-tokens.mjs && next typegen",
     "typecheck": "tsc --noEmit",
     "tokens": "node scripts/generate-tokens.mjs",
     "data:validate": "node scripts/validate-data.mjs",
