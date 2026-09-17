@@ -103,7 +103,7 @@ export interface FriendGraph {
 
 /**
  * Builds the reagraph input. `photos` is an optional map of personId to
- * photoURL from the live Firestore `people` docs (Phase 5).
+ * photoURL from the live Supabase `people` rows (Phase 5).
  */
 export function buildFriendGraph(photos: Record<string, string | null> = {}): FriendGraph {
   const strengths = strengthMap();

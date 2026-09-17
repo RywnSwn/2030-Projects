@@ -7,6 +7,7 @@ import { useFrame } from "@react-three/fiber";
 import { CanvasTexture, Color, DoubleSide, SRGBColorSpace, type Material } from "three";
 import type { NodeRendererProps } from "reagraph";
 import { designTokens } from "@/lib/designTokens";
+import { withBasePath } from "@/lib/basePath";
 import { shade } from "@/lib/louvainColors";
 import type { PersonNodeData } from "@/lib/graphData";
 
@@ -89,7 +90,7 @@ export function PersonNode({ node, size, active, opacity, animated: isAnimated }
       <Billboard follow>
         <Text
           position={[0, -(size + LABEL_SIZE * 0.55), 0.5]}
-          font="/fonts/BricolageGrotesque.ttf"
+          font={withBasePath("/fonts/BricolageGrotesque.ttf")}
           fontSize={LABEL_SIZE}
           color={designTokens.ink}
           anchorX="center"
