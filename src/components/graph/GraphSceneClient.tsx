@@ -29,10 +29,17 @@ function useSmallScreen(): boolean | null {
  * so the wrong scene never flashes. Profile photos are fetched here and fade
  * onto the dots whenever they arrive; the graph never waits for them.
  */
-export function GraphSceneClient({ onHoverPerson }: { onHoverPerson?: (d: PersonNodeData | null) => void }) {
+export function GraphSceneClient({
+  onHoverPerson,
+  paused,
+}: {
+  onHoverPerson?: (d: PersonNodeData | null) => void;
+  /** True while the scene is scrolled out of view. See FriendGraphCanvas. */
+  paused?: boolean;
+}) {
   const small = useSmallScreen();
   const { photos } = useProfiles();
   if (small === null) return null;
   const Scene = small ? GraphScene2D : GraphScene3D;
-  return <Scene photos={photos} onHoverPerson={onHoverPerson} />;
+  return <Scene photos={photos} onHoverPerson={onHoverPerson} paused={paused} />;
 }

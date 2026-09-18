@@ -29,6 +29,14 @@ export interface FriendGraphCanvasProps {
   /** personId -> signed photo URL. Arrives after the first paint; see buildFriendGraph. */
   photos?: Record<string, string | null>;
   onHoverPerson?: (data: PersonNodeData | null) => void;
+  /**
+   * Set while the scene is scrolled out of view. Stops the idle drift so an
+   * invisible map isn't quietly orbiting and draining a phone battery. It
+   * cannot stop the WebGL render loop itself: reagraph gives no access to
+   * react-three-fiber's `frameloop` prop, so the canvas is also hidden by its
+   * parent, which at least spares the compositor a full-screen layer.
+   */
+  paused?: boolean;
 }
 
 /** What the 2D/3D wrappers take: everything except the mode they pick themselves. */
@@ -39,14 +47,14 @@ export type GraphSceneProps = Omit<FriendGraphCanvasProps, "mode">;
  * set `mode`; everything else (theme, nodes, hover dimming, click-to-profile)
  * is identical, which is the whole point of picking reagraph.
  */
-export function FriendGraphCanvas({ mode, photos, onHoverPerson }: FriendGraphCanvasProps) {
+export function FriendGraphCanvas({ mode, photos, onHoverPerson, paused = false }: FriendGraphCanvasProps) {
   const ref = useRef<GraphCanvasRef | null>(null);
   const router = useRouter();
   const [hovering, setHovering] = useState(false);
   const { nodes, edges } = useMemo(() => buildFriendGraph(), []);
   const { actives, onNodePointerOver, onNodePointerOut } = useEgoHighlight(ref, nodes, edges);
 
-  useIdleDrift(ref, { enabled: mode === "3d", paused: hovering });
+  useIdleDrift(ref, { enabled: mode === "3d" && !paused, paused: hovering });
   useLockedCamera(ref, { rotate: mode === "3d" });
 
   // Reagraph fits the camera once, early. Fit again after the layout settles
