@@ -49,7 +49,7 @@ export default async function ProfilePage({ params }: PageProps<"/profile/[perso
               >
                 <span
                   aria-hidden="true"
-                  className="inline-block size-3 shrink-0 rounded-full border border-ink/15"
+                  className="inline-block size-3 shrink-0 rounded-full border border-ink/45"
                   style={{ backgroundColor: communityColor(communityOf(other.id)) }}
                 />
                 <span className="font-display font-medium">{other.name}</span>

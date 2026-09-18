@@ -158,7 +158,7 @@ export function WelcomeMap() {
               <>
                 <span
                   aria-hidden="true"
-                  className="size-3 shrink-0 rounded-full border border-ink/15"
+                  className="size-3 shrink-0 rounded-full border border-ink/45"
                   style={{ backgroundColor: communityColor(hovered.community) }}
                 />
                 <span className="font-display font-medium">{hovered.name}</span>

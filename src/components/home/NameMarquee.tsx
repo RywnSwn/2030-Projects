@@ -23,7 +23,7 @@ export function NameMarquee() {
             {names.map((person) => (
               <li key={`${run}-${person.id}`} className="flex items-center gap-4 px-5">
                 <span
-                  className="size-2.5 shrink-0 rounded-full border border-ink/10"
+                  className="size-2.5 shrink-0 rounded-full border border-ink/45"
                   style={{ backgroundColor: person.color }}
                 />
                 <span className="whitespace-nowrap font-display text-xl font-medium sm:text-2xl">

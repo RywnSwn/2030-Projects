@@ -95,7 +95,7 @@ function ThreadDiagram() {
           const radius = 20 + group.members.length * 1.3;
           return (
             <g key={group.index}>
-              <circle cx={point.x} cy={point.y} r={radius} fill={group.colorHex} stroke="#1C1A17" strokeOpacity={0.12} />
+              <circle cx={point.x} cy={point.y} r={radius} fill={group.colorHex} stroke="#1C1A17" strokeOpacity={0.45} />
               <text
                 x={point.x}
                 y={point.y + 5}

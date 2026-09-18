@@ -350,6 +350,12 @@ Build: `lore/page.tsx`, `LoreWall.tsx` (friendly empty-state when no posts exist
 Key files: `src/app/lore/page.tsx`, `src/components/lore/*`, `firestore.rules`.
 Verify: fresh deploy shows the empty state; posting as one user shows it to all logged-in users; only the author can delete their own post.
 
+**Phase 10 status (Sept 2026): mostly done, one piece left.**
+Done: `privacy/page.tsx` (plain-language, readable without signing in) and a `terms/page.tsx` house-rules page that was not in the original plan; both added to `PUBLIC_PATHS` in `AuthGate`. `SiteFooter` moved into the root layout so the privacy link is reachable from every page including the sign-in screen and the gated state. SEO blocking was already in place (`robots.txt` disallow-all plus `metadata.robots` noindex inherited by every route) and is re-verified in the build output. Cookie consent re-confirmed as not needed and the reason written onto the privacy page: the site sets no cookies of its own, the Supabase session lives in `localStorage`, and the redirect path lives in `sessionStorage`.
+Accessibility pass done: skip link as the first tab stop, one `<h1>` per page with no heading-level skips, every image carries alt text (only `Avatar` renders an `<img>`), no unnamed links or buttons, no duplicate ids. Contrast measured rather than eyeballed — every text pairing clears WCAG AA (the tightest is ink-muted on bg-muted at 4.92:1), and the pastel swatch borders were raised from `ink/15` to `ink/45` so the color chips clear 3:1 non-text contrast against the page.
+**Known and accepted**: the pastels themselves sit at 1.2–1.5:1 against the warm off-white, far under the 3:1 in WCAG 1.4.11. Darkening them would break the locked palette, so the mitigation is that color is never the only carrier of meaning: the legend, the group cards, the diagram circles and the people list all pair every color with a group number, a count or a name. Keep that rule if anything new uses a pastel.
+**Still to build**: `settings/page.tsx` + `src/lib/deleteAccount.ts`, the real delete-my-account flow. Until it exists the privacy page says removal is done by hand on request, which has to stay true.
+
 **Phase 10 — Legal, privacy, accessibility, SEO-blocking pass**
 Build:
 - `privacy/page.tsx`: plain-language notice (what's collected, who sees what), reachable without login, linked from every page.

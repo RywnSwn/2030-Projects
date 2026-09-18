@@ -33,7 +33,7 @@ export function GroupCards() {
                 <div className="flex items-center gap-3">
                   <span
                     aria-hidden="true"
-                    className="size-6 rounded-full border border-ink/15"
+                    className="size-6 rounded-full border border-ink/45"
                     style={{ backgroundColor: group.colorHex }}
                   />
                   <h3 className="font-display text-xl font-semibold">Group {group.index + 1}</h3>

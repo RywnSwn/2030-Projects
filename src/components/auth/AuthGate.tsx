@@ -7,7 +7,7 @@ import { NotOnRoster } from "./NotOnRoster";
 import { SitePaused } from "./SitePaused";
 
 /** Pages anyone can open without signing in. Everything else needs a claimed account. */
-const PUBLIC_PATHS = ["/login", "/privacy"];
+const PUBLIC_PATHS = ["/login", "/privacy", "/terms"];
 
 function isPublic(pathname: string): boolean {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));

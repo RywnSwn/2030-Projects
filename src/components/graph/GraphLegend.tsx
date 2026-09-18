@@ -11,7 +11,7 @@ export function GraphLegend() {
         >
           <span
             aria-hidden="true"
-            className="size-2.5 rounded-full border border-ink/15"
+            className="size-2.5 rounded-full border border-ink/45"
             style={{ backgroundColor: c.colorHex }}
           />
           Group {c.index + 1}

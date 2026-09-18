@@ -10,7 +10,7 @@ const items = [
     art: (
       <svg viewBox="0 0 120 60" className="h-14 w-full" aria-hidden="true">
         {pastels.slice(0, 4).map((hex, i) => (
-          <circle key={hex} cx={18 + i * 28} cy={30} r={11} fill={hex} stroke="#1C1A17" strokeOpacity={0.12} />
+          <circle key={hex} cx={18 + i * 28} cy={30} r={11} fill={hex} stroke="#1C1A17" strokeOpacity={0.45} />
         ))}
       </svg>
     ),
@@ -21,7 +21,7 @@ const items = [
     art: (
       <svg viewBox="0 0 120 60" className="h-14 w-full" aria-hidden="true">
         {[6, 10, 14, 18].map((r, i) => (
-          <circle key={r} cx={16 + i * 29} cy={30} r={r} fill={pastels[1] ?? "#CFC5F5"} stroke="#1C1A17" strokeOpacity={0.12} />
+          <circle key={r} cx={16 + i * 29} cy={30} r={r} fill={pastels[1] ?? "#CFC5F5"} stroke="#1C1A17" strokeOpacity={0.45} />
         ))}
       </svg>
     ),

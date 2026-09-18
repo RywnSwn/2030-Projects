@@ -40,7 +40,7 @@ export function ProfileClient({ person }: { person: Person }) {
           <p className="mt-1 inline-flex items-center gap-2 text-ink-muted">
             <span
               aria-hidden="true"
-              className="inline-block size-3 rounded-full border border-ink/15"
+              className="inline-block size-3 rounded-full border border-ink/45"
               style={{ backgroundColor: communityColor(community) }}
             />
             Group {community + 1}

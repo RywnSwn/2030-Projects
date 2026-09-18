@@ -55,7 +55,7 @@ export function PeopleListFallback() {
               >
                 <span
                   aria-hidden="true"
-                  className="inline-block size-3.5 shrink-0 rounded-full border border-ink/15"
+                  className="inline-block size-3.5 shrink-0 rounded-full border border-ink/45"
                   style={{ backgroundColor: communityColor(community) }}
                 />
                 <span className="font-display font-medium">{p.name}</span>
