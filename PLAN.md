@@ -15,6 +15,7 @@ The repo (`/home/user/2030-Projects`) is currently a **100% blank slate**: empty
 ## Locked design decisions (do not relitigate these)
 
 **Landing page graph**
+- The landing page doubles as the site's **welcome page**: the map renders full-bleed behind a title card, and scrolling one screen fades the title out and hands the map over, fully interactive. One graph instance the whole way down: the scroll changes what is over it, never remounts it.
 - Louvain community detection on the full weighted graph (39 people, 741 pairwise connections, weights 0–5).
 - Visual style: **semi-3D**, not flat-2D-only and not a full walkable 3D "world" (no floors, no walking, no rooms/environment). Real depth, lighting, and a camera that orbits/zooms with limited tilt.
 - Background: warm off-white, not pure white (pure white washes out pastels).
@@ -23,6 +24,7 @@ The repo (`/home/user/2030-Projects`) is currently a **100% blank slate**: empty
 - Depth fog so distant nodes fade slightly pale — this is the light-mode equivalent of the neon-glow trick dark sites use, and is how "3D" reads on a white background.
 - Soft drop shadows under nodes for depth.
 - Slow idle camera drift so the scene never looks frozen; pauses on interaction, resumes after ~8s idle.
+- Camera controls are **rotate + zoom only. Dragging the graph around (pan) is off.** Panning let people shove the whole grade off the edge of the screen with no way back, and it fought the idle drift. Orbit and zoom cover everything the map needs, and with nothing to pan there is nothing to rubber-band at the edges.
 - Names visible by default (not hover-only).
 - Interaction: hover/select a person → their direct connections stay full opacity, everyone else dims to **~40%** (not a hard fade to near-invisible — this was explicitly chosen as softer than a typical "ego network" implementation). This is the "ego highlight" UX pattern; research shows it cuts time-to-find-a-neighbor from 100+ seconds to ~10–20.
 - Mobile: automatically falls back to a **flat 2D** version of the same graph on small screens (3D orbit controls are fiddly on touch/low-end phones). This is a prop swap, not a second implementation, if using reagraph (see Tech Stack).
@@ -356,7 +358,6 @@ Verify: `curl <hosted-url>/robots.txt` shows `Disallow: /`; view-source shows `n
 
 - **Events edit/delete permissions**: current plan has only the creator able to edit/delete their own event. An `isAdmin` escape-hatch for the site owner to moderate any event was considered but needs an efficient `uid → isAdmin` lookup (a denormalized doc) to add cleanly to rules — treat as a Phase 8+ refinement if moderation becomes necessary, not a v1 requirement.
 - Optional "like/react" mechanic on lore posts (`reactions` subcollection) is modeled in the data schema but is a stretch item, not required for MVP.
-- **3D map camera bounds should feel springy, not hard-clamped**: `src/components/graph/FriendGraphCanvas.tsx` currently sets `minDistance`/`maxDistance` (400/30000 in 3D, 250/30000 in 2D) straight on reagraph's camera controls, so zoom just stops dead at the limit. Wanted instead: as the user scales out toward `maxDistance` (or drags/pans past the graph's bounds), zoom/pan speed should progressively slow down (rubber-band resistance), and if released past that soft limit the camera should spring back to the last valid position/distance — same springy easing already locked in under "Motion" in the Visual/design system section above. Same resistance-then-spring-back behavior for dragging/panning too far from the graph, not a hard stop. Reagraph's built-in `minDistance`/`maxDistance` can't do rubber-banding on their own, so this needs manual pointer/wheel handling layered over the camera ref, similar in spirit to the existing `useIdleDrift.ts` hook (`src/components/graph/useIdleDrift.ts`). Scope as a refinement pass on top of the existing Phase 2/3 camera work.
 - **Login page needs a visual cleanup pass**: `src/app/login/LoginClient.tsx` (built in Phase 4) currently just renders plain centered text and a plain rounded button — it doesn't use the site's design tokens (Bricolage Grotesque/Fraunces fonts, warm off-white background, pastel accents) the rest of the app is styled with. Give it a proper pass matching the rest of the site before/alongside whatever phase comes next.
 
 ---
