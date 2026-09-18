@@ -23,12 +23,15 @@ function weightOf(e: LayoutLink): number {
   return e?.data?.weight ?? e?.weight ?? 2;
 }
 
-interface FriendGraphCanvasProps {
+export interface FriendGraphCanvasProps {
   mode: GraphMode;
-  /** personId -> photoURL from live profiles (Phase 5). */
+  /** personId -> signed photo URL. Arrives after the first paint; see buildFriendGraph. */
   photos?: Record<string, string | null>;
   onHoverPerson?: (data: PersonNodeData | null) => void;
 }
+
+/** What the 2D/3D wrappers take: everything except the mode they pick themselves. */
+export type GraphSceneProps = Omit<FriendGraphCanvasProps, "mode">;
 
 /**
  * The shared graph canvas. GraphScene2D / GraphScene3D are thin wrappers that
@@ -39,7 +42,7 @@ export function FriendGraphCanvas({ mode, photos, onHoverPerson }: FriendGraphCa
   const ref = useRef<GraphCanvasRef | null>(null);
   const router = useRouter();
   const [hovering, setHovering] = useState(false);
-  const { nodes, edges } = useMemo(() => buildFriendGraph(photos), [photos]);
+  const { nodes, edges } = useMemo(() => buildFriendGraph(), []);
   const { actives, onNodePointerOver, onNodePointerOut } = useEgoHighlight(ref, nodes, edges);
 
   useIdleDrift(ref, { enabled: mode === "3d", paused: hovering });
@@ -94,7 +97,13 @@ export function FriendGraphCanvas({ mode, photos, onHoverPerson }: FriendGraphCa
 
   // reagraph invokes renderNode as a plain function, so it must return an
   // element; PersonNode itself uses hooks and has to be a real component.
-  const renderNode = useCallback((props: NodeRendererProps) => <PersonNode {...props} />, []);
+  const renderNode = useCallback(
+    (props: NodeRendererProps) => {
+      const personId = (props.node.data as PersonNodeData | undefined)?.personId;
+      return <PersonNode {...props} photoURL={personId ? photos?.[personId] : null} />;
+    },
+    [photos],
+  );
 
   // Louvain groups pull together, cross-group ties stay loose, and every tie
   // scales with its weight so the picture matches the numbers.

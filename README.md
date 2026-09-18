@@ -20,7 +20,8 @@ originally written for Firebase; the roadmap is unchanged, only the plumbing.
 | 2 | Semi-3D scene: fog, shadows, custom nodes, idle drift | done |
 | 3 | Hover highlight, mobile 2D fallback, `/people` list | done |
 | 4 | Google sign-in via Supabase + account claiming, login gate | done in code, needs the Supabase project (see below) |
-| 5 to 9 | Profiles, homework, GPA, events, lore | not started |
+| 5 | Profile photo + bio, owner-only editing, ego mini-graph, photos on the map | done in code, needs the Supabase project (see below) |
+| 6 to 9 | Homework, GPA, events, lore | not started |
 | 10 | Privacy page, delete account, a11y audit | partly (noindex + robots.txt already in) |
 
 Until the two Supabase variables are set at build time the site runs in
@@ -74,6 +75,7 @@ supabase/        migrations/ (people table, RLS, claim_person()), seed.sql (gene
 .github/workflows/deploy.yml   build + deploy to GitHub Pages on every push to the default branch
 src/lib/         designTokens (single source of truth for colors), graphData, graphTheme, louvainColors
                  supabase (client + PersonRow), auth (AuthProvider, useAuth, claiming), basePath
+                 profiles (live bio/photo rows, signed photo URLs, owner-only saves)
 src/components/auth/
   AuthGate.tsx           route-level login gate (transparent while Supabase is unconfigured)
   AccountMenu.tsx        header sign-in / name / sign-out
@@ -85,7 +87,12 @@ src/components/graph/
   DepthFog.tsx           camera-relative fog for depth on a light background
   useIdleDrift.ts        slow auto-orbit that pauses on interaction
   useEgoHighlight.ts     hover dims non-neighbors to 40%
-src/app/         / (map), /people (keyboard list), /profile/[personId] (stub), /login
+src/components/profile/
+  ProfileClient.tsx      live half of a profile: photo, bio, edit button, ego graph
+  ProfileEditForm.tsx    owner-only bio + photo upload (react-hook-form + zod)
+  EgoMiniGraph.tsx       flat graph of one person's weight>=2 connections
+  Avatar.tsx             round photo, or initials on the community pastel
+src/app/         / (map), /people (keyboard list), /profile/[personId], /login
 ```
 
 Colors live once, in `src/lib/designTokens.ts`. `npm run tokens` (run
@@ -136,8 +143,24 @@ create a second Supabase project for this site; reuse that one. What is left:
 How claiming works: on first login the app calls the `claim_person()` database
 function, which links the Google account (`auth.uid()`) to the one unclaimed
 `people` row whose email matches the account's email. Owners can then update
-only their own `bio` and `photo_url` (enforced by RLS plus column grants);
+only their own `bio` and `photo_path` (enforced by RLS plus column grants);
 `email`, `owner_uid` and `is_admin` are never writable from the browser.
+
+## Profile photos (Phase 5)
+
+Photos live in a **private** Supabase Storage bucket, `profile-photos`, one
+folder per person (`<personId>/<random>.jpg`). Private is the point: a public
+bucket would put 39 students' faces on the open web behind nothing but an
+unguessable URL. The browser never gets a permanent link — `src/lib/profiles.ts`
+batch-signs one short-lived URL per photo on load, which is why
+`people.photo_path` holds an object path and not a URL.
+
+Writes are gated by `owns_person_folder()`, used in the bucket's row level
+security policies: you may only write under the folder named after the person
+your account claimed. Everyone signed in can read.
+
+`supabase/migrations/20260918000000_profile_photos.sql` is already applied to
+the project above. Applying it to a fresh project is the only setup step.
 
 ## Search engines
 

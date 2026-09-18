@@ -27,15 +27,3 @@ export interface CommunitiesFile {
   communities: Record<string, number>;
   communityMeta: CommunityMeta[];
 }
-
-/**
- * Live half of a person, stored in the Supabase `people` table (Phase 4+).
- * Camel-cased view of `PersonRow` in src/lib/supabase.ts.
- */
-export interface PersonProfile {
-  email: string | null;
-  ownerUid: string | null;
-  photoURL: string | null;
-  bio: string;
-  isAdmin: boolean;
-}
