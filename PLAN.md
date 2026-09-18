@@ -16,6 +16,7 @@ The repo (`/home/user/2030-Projects`) is currently a **100% blank slate**: empty
 
 **Landing page graph**
 - The landing page doubles as the site's **welcome page**: the map renders full-bleed behind a title card, and scrolling one screen fades the title out and hands the map over, fully interactive. One graph instance the whole way down: the scroll changes what is over it, never remounts it.
+- Below the map the page becomes an ordinary scrolling site (see Phase 5.5). Its argument, in order: here is the grade split into colors, here is how to read them, here are the groups, and here is why the groups barely hold. The point of the whole page is the last part, and it is made with measured numbers rather than sentiment.
 - Louvain community detection on the full weighted graph (39 people, 741 pairwise connections, weights 0–5).
 - Visual style: **semi-3D**, not flat-2D-only and not a full walkable 3D "world" (no floors, no walking, no rooms/environment). Real depth, lighting, and a camera that orbits/zooms with limited tilt.
 - Background: warm off-white, not pure white (pure white washes out pastels).
@@ -321,6 +322,13 @@ Verify: sign in with a seeded test-user account, confirm the matching `people/{p
 Build: `profile/[personId]/page.tsx` (view: photo, bio, `EgoMiniGraph.tsx` showing only weight≥2 connections); `ProfileEditForm.tsx` (owner-only: bio + photo upload to `profile-photos/{personId}/`, react-hook-form + zod, `storage.rules` committed); clicking a node opens this profile; `PersonNode.tsx` upgraded to render real `photoURL` textures.
 Key files: `src/app/profile/[personId]/page.tsx`, `src/components/profile/ProfileEditForm.tsx`, `src/components/profile/EgoMiniGraph.tsx`, `storage.rules`.
 Verify: edit own bio/photo as one test user, confirm it renders in the main graph; log in as a second user, confirm you can view but not edit the first person's profile (UI hides edit, and a direct write attempt is rejected by rules).
+
+**Phase 5.5 — Landing page below the map** (not in the original roadmap; added Sept 2026)
+Build: the map hero releases into a real page instead of ending at the fold. `src/lib/gradeStats.ts` derives whole-grade figures from `visibleConnections` only; `HowToRead.tsx` decodes color/size/thickness; `GroupCards.tsx` turns each legend swatch into faces; `ThreadsBetween.tsx` is the centrepiece (chord diagram of cross-group friendships plus the headline numbers); `FaceWall.tsx` is all 39 with the map's ego-highlight on hover; `ClosingBand.tsx` + `NameMarquee.tsx` close it out; `SiteFooter.tsx` carries the "the algorithm picked these, not us" note. `Reveal.tsx`/`useInView.ts`/`CountUp.tsx` are the shared scroll choreography, all of it disabled under `prefers-reduced-motion`.
+Key files: `src/lib/gradeStats.ts`, `src/components/home/*`, `src/components/ui/SiteFooter.tsx`, `src/app/page.tsx`.
+Verify: every number on the page recomputes to the same value straight from `data/*.json`; no horizontal overflow at 390px; the reveal animations flatten with reduce-motion on.
+
+**Known limitation from this phase**: when the map scrolls out of view the idle drift stops and the canvas is hidden, but the WebGL render loop itself keeps running. Reagraph exposes no way through to react-three-fiber's `frameloop` prop (checked against the pinned 4.32.0), so fully idling the GPU needs either an upstream change or unmounting the scene, and unmounting would restart the force layout and re-shuffle the whole grade on scroll-back. Revisit if battery drain is ever reported.
 
 **Phase 6 — Homework tracker**
 Build: `homework/page.tsx`, `HomeworkList.tsx`, `HomeworkForm.tsx` (subject, title, due date, notes, completed toggle); CRUD scoped to `ownerUid == auth.uid`; `homework` rules block deployed.

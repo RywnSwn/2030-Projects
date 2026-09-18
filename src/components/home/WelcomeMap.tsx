@@ -22,14 +22,18 @@ const stats = [
 ];
 
 /**
- * The landing page: one graph, two states. It opens as a title card over a
+ * The landing page hero: one graph, two states. It opens as a title card over a
  * dimmed map, and a screen of scrolling lifts the wash off and hands the map
  * over. Scrolling back brings the title back, which only works because the
  * camera has no zoom and so never swallows the wheel.
+ *
+ * The stage is taller than the reveal needs so the map gets a screen or so of
+ * being yours before the rest of the page arrives underneath it.
  */
 export function WelcomeMap() {
   const stageRef = useRef<HTMLDivElement>(null);
   const [revealed, setRevealed] = useState(false);
+  const [offscreen, setOffscreen] = useState(false);
   const [hovered, setHovered] = useState<PersonNodeData | null>(null);
 
   useEffect(() => {
@@ -58,15 +62,37 @@ export function WelcomeMap() {
     };
   }, []);
 
+  // Once the map is scrolled away, stop the idle drift and let the compositor
+  // drop the canvas layer. The scene stays mounted: remounting would restart
+  // the force layout and re-shuffle the whole grade on the way back up.
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setOffscreen(!entry.isIntersecting),
+      { threshold: 0 },
+    );
+    observer.observe(stage);
+    return () => observer.disconnect();
+  }, []);
+
+  const handOver = () => {
+    window.scrollTo({
+      top: window.innerHeight * REVEAL_SCREENS,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+    });
+  };
+
   return (
-    <div className="relative h-[180dvh]">
+    <div id="top" className="relative h-[230dvh]">
       <div ref={stageRef} className="sticky top-14 h-[calc(100dvh-3.5rem)] overflow-hidden">
         <div
           role="region"
           aria-label="Friend map"
           className={clsx("graph-frame absolute inset-0", !revealed && "pointer-events-none")}
+          style={{ visibility: offscreen ? "hidden" : "visible" }}
         >
-          <GraphLayer onHoverPerson={setHovered} />
+          <GraphLayer onHoverPerson={setHovered} paused={offscreen} />
         </div>
 
         {/* Warm wash over the map while the title is up; lifts as you scroll. */}
@@ -111,7 +137,7 @@ export function WelcomeMap() {
 
             <button
               type="button"
-              onClick={() => setRevealed(true)}
+              onClick={handOver}
               className="mt-8 inline-flex sm:mt-10 items-center gap-2 rounded-full border border-ink/15 bg-bg/80 px-5 py-2.5 font-display text-sm font-medium shadow-sm backdrop-blur transition-colors hover:bg-ink hover:text-bg"
             >
               Explore the map
@@ -155,6 +181,19 @@ export function WelcomeMap() {
             </Link>
           </div>
         </div>
+
+        {/* Says there is a page under the map. Without it the hero reads as the
+            whole site and nobody scrolls past it. */}
+        <p
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-20 flex justify-center transition-opacity duration-500 ease-out sm:bottom-24"
+          style={{ opacity: "calc(var(--reveal, 0) * 2 - 1)" }}
+        >
+          <span className="inline-flex items-center gap-2 rounded-full bg-bg/70 px-3 py-1 font-display text-[0.7rem] uppercase tracking-[0.18em] text-ink-muted backdrop-blur">
+            Keep scrolling
+            <ChevronDown size={13} className="animate-bob" />
+          </span>
+        </p>
       </div>
     </div>
   );
