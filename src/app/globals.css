@@ -50,3 +50,23 @@ h3,
   position: absolute;
   inset: 0;
 }
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+.animate-bob {
+  animation: bob 2.4s var(--ease-spring) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bob {
+    animation: none;
+  }
+}

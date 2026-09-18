@@ -10,6 +10,7 @@ import { DepthFog } from "./DepthFog";
 import { PersonNode } from "./PersonNode";
 import { useEgoHighlight } from "./useEgoHighlight";
 import { useIdleDrift } from "./useIdleDrift";
+import { useLockedCamera } from "./useLockedCamera";
 
 export type GraphMode = "2d" | "3d";
 
@@ -46,6 +47,7 @@ export function FriendGraphCanvas({ mode, photos, onHoverPerson }: FriendGraphCa
   const { actives, onNodePointerOver, onNodePointerOut } = useEgoHighlight(ref, nodes, edges);
 
   useIdleDrift(ref, { enabled: mode === "3d", paused: hovering });
+  useLockedCamera(ref, { rotate: mode === "3d" });
 
   // Reagraph fits the camera once, early. Fit again after the layout settles
   // and whenever the viewport changes so portrait phones see the whole graph.
@@ -129,6 +131,8 @@ export function FriendGraphCanvas({ mode, photos, onHoverPerson }: FriendGraphCa
       layoutType={is3d ? "forceDirected3d" : "forceDirected2d"}
       layoutOverrides={layoutOverrides}
       clusterAttribute="community"
+      // useLockedCamera strips the pan actions this leaves behind: 3D ends up
+      // rotate + zoom, 2D ends up zoom only.
       cameraMode={is3d ? "rotate" : "pan"}
       sizingType="attribute"
       sizingAttribute="strength"
