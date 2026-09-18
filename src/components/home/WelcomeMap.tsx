@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useRef, useState, type CSSProperties } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import clsx from "clsx";
@@ -24,9 +24,8 @@ const stats = [
 /**
  * The landing page: one graph, two states. It opens as a title card over a
  * dimmed map, and a screen of scrolling lifts the wash off and hands the map
- * over. The handover is one-way, because once the map is live it owns the wheel (that
- * is zoom), so the intro's scroll room goes away instead of leaving a scroll
- * the pointer can never reach.
+ * over. Scrolling back brings the title back, which only works because the
+ * camera has no zoom and so never swallows the wheel.
  */
 export function WelcomeMap() {
   const stageRef = useRef<HTMLDivElement>(null);
@@ -34,7 +33,6 @@ export function WelcomeMap() {
   const [hovered, setHovered] = useState<PersonNodeData | null>(null);
 
   useEffect(() => {
-    if (revealed) return;
     const stage = stageRef.current;
     if (!stage) return;
 
@@ -44,7 +42,7 @@ export function WelcomeMap() {
       const distance = Math.max(1, window.innerHeight * REVEAL_SCREENS);
       const progress = Math.min(1, window.scrollY / distance);
       stage.style.setProperty("--reveal", progress.toFixed(3));
-      if (progress >= 1) setRevealed(true);
+      setRevealed(progress > 0.98);
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
@@ -58,19 +56,11 @@ export function WelcomeMap() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, [revealed]);
-
-  useEffect(() => {
-    if (revealed) window.scrollTo({ top: 0 });
-  }, [revealed]);
+  }, []);
 
   return (
-    <div className={clsx("relative", !revealed && "h-[180dvh]")}>
-      <div
-        ref={stageRef}
-        style={revealed ? ({ "--reveal": 1 } as CSSProperties) : undefined}
-        className="sticky top-14 h-[calc(100dvh-3.5rem)] overflow-hidden"
-      >
+    <div className="relative h-[180dvh]">
+      <div ref={stageRef} className="sticky top-14 h-[calc(100dvh-3.5rem)] overflow-hidden">
         <div
           role="region"
           aria-label="Friend map"

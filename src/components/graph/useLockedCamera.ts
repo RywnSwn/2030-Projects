@@ -16,19 +16,23 @@ function actionsOf(controls: Controls): Record<string, number> {
 const noTruck = () => Promise.resolve();
 
 /**
- * Rotate and zoom only. Reagraph's `cameraMode` sets the left mouse button and
- * nothing else, so pan stays live on the right button, the middle button,
- * two-finger touch, hold-space-and-drag, and window-level arrow keys. Any of
- * those lets someone shove the whole grade off screen with no way back.
+ * Rotation is the only camera control. No pan, no zoom: the graph is framed to
+ * fit and stays that way, so nobody can shove the grade off screen or scale it
+ * into a blur with no way back.
  *
- * The action map covers the pointer gestures. Arrow keys don't go through it:
- * reagraph calls `controls.truck()` directly, so that one gets neutralized on
- * the instance. Nothing else in reagraph trucks (camera fits go through
- * `fitToBox`/`zoomTo`), so no fit or recenter breaks.
+ * Reagraph's `cameraMode` only sets the left mouse button, leaving pan on the
+ * right button, the middle button, two-finger touch and hold-space-and-drag,
+ * and zoom on the wheel and pinch. All of those get cleared here. Arrow keys
+ * don't go through the action map at all: reagraph calls `controls.truck()`
+ * directly, so that gets neutralized on the instance. Nothing else in reagraph
+ * trucks (camera fits go through `fitToBox`/`zoomTo`), so fitting still works.
  *
  * Re-checked every frame rather than set once, because reagraph reassigns the
  * actions whenever its own camera effects re-run, and holding space rewrites
  * the left button on purpose.
+ *
+ * Clearing the wheel action also hands the wheel back to the page, which is
+ * what lets the landing page scroll over a live map.
  */
 export function useLockedCamera(ref: RefObject<GraphCanvasRef | null>, { rotate }: { rotate: boolean }) {
   useEffect(() => {
@@ -45,14 +49,20 @@ export function useLockedCamera(ref: RefObject<GraphCanvasRef | null>, { rotate 
 
       const ACTION = actionsOf(controls);
       const left = (rotate ? ACTION.ROTATE : ACTION.NONE) as MouseAction;
-      if (controls.mouseButtons.left === left && controls.mouseButtons.right === ACTION.NONE) return;
+      if (
+        controls.mouseButtons.left === left &&
+        controls.mouseButtons.right === ACTION.NONE &&
+        controls.mouseButtons.wheel === ACTION.NONE
+      ) {
+        return;
+      }
 
       controls.mouseButtons.left = left;
       controls.mouseButtons.right = ACTION.NONE as MouseAction;
-      controls.mouseButtons.middle = ACTION.DOLLY as MouseAction;
-      controls.mouseButtons.wheel = ACTION.DOLLY as MouseAction;
+      controls.mouseButtons.middle = ACTION.NONE as MouseAction;
+      controls.mouseButtons.wheel = ACTION.NONE as MouseAction;
       controls.touches.one = (rotate ? ACTION.TOUCH_ROTATE : ACTION.NONE) as SingleTouchAction;
-      controls.touches.two = ACTION.TOUCH_DOLLY as MultiTouchAction;
+      controls.touches.two = ACTION.NONE as MultiTouchAction;
       controls.touches.three = ACTION.NONE as MultiTouchAction;
     };
 
