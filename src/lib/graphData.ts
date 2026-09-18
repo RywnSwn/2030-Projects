@@ -30,6 +30,13 @@ export function communityOf(personId: string): number {
   return communities.communities[personId] ?? 0;
 }
 
+/** "Ethan Chen Aung" -> "EA". The fallback face on both the dots and the profile avatars. */
+export function initialsOf(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 export interface PersonNodeData {
   personId: string;
   name: string;
@@ -38,7 +45,6 @@ export interface PersonNodeData {
   strength: number;
   /** Count of visible edges. */
   degree: number;
-  photoURL?: string | null;
 }
 
 export interface VisibleNeighbor {
@@ -102,10 +108,11 @@ export interface FriendGraph {
 }
 
 /**
- * Builds the reagraph input. `photos` is an optional map of personId to
- * photoURL from the live Supabase `people` rows (Phase 5).
+ * Builds the reagraph input. Photos deliberately do not live here: they arrive
+ * after the first paint, and rebuilding the node array would restart the
+ * layout. They reach the node renderer as a prop instead.
  */
-export function buildFriendGraph(photos: Record<string, string | null> = {}): FriendGraph {
+export function buildFriendGraph(): FriendGraph {
   const strengths = strengthMap();
   const nodes: GraphNode[] = people.map((p) => {
     const s = strengths.get(p.id) ?? { strength: 0, degree: 0 };
@@ -116,7 +123,6 @@ export function buildFriendGraph(photos: Record<string, string | null> = {}): Fr
       community,
       strength: s.strength,
       degree: s.degree,
-      photoURL: photos[p.id] ?? null,
     };
     return {
       id: p.id,

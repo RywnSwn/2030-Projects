@@ -32,7 +32,8 @@ export interface PersonRow {
   id: string;
   email: string | null;
   owner_uid: string | null;
-  photo_url: string | null;
+  /** Object path in the private profile-photos bucket, not a URL. See src/lib/profiles.ts. */
+  photo_path: string | null;
   bio: string;
   is_admin: boolean;
   updated_at: string;
