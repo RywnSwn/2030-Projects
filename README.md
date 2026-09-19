@@ -26,6 +26,7 @@ originally written for Firebase; the roadmap is unchanged, only the plumbing.
 | 8.5 | Announcements (admin-only broadcast) — not in the original plan | done in code, needs the Supabase project (see below) |
 | 9 | Lore | not started |
 | 10 | Privacy page, delete account, a11y audit | partly (noindex + robots.txt already in) |
+| 11 | Visual overhaul | not started, no direction locked — read the phase notes before touching it |
 
 Page transitions (not a phase — a cross-cutting extra added alongside 8/8.5): every route crossfades into the next via React's `<ViewTransition>`, and flattens to an instant swap under `prefers-reduced-motion`.
 

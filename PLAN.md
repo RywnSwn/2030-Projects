@@ -16,7 +16,8 @@ The repo (`/home/user/2030-Projects`) is currently a **100% blank slate**: empty
 
 **Landing page graph**
 - The landing page doubles as the site's **welcome page**: the map renders full-bleed behind a title card, and scrolling one screen fades the title out and hands the map over, fully interactive. One graph instance the whole way down: the scroll changes what is over it, never remounts it.
-- Below the map the page becomes an ordinary scrolling site (see Phase 5.5). Its argument, in order: here is the grade split into colors, here is how to read them, here are the groups, and here is why the groups barely hold. The point of the whole page is the last part, and it is made with measured numbers rather than sentiment.
+- Below the map the page becomes an ordinary scrolling site (see Phase 5.5). Its argument, in order: here is the grade split into colors, here is how to read them, here are the groups, and here is everywhere else you can go.
+  - **Changed in Sept 2026:** the original order ended on "why the groups barely hold" — a chord diagram of cross-group friendships plus headline numbers (`ThreadsBetween`), then a wall of all 39 faces (`FaceWall`). Both were cut: the face wall duplicated `/people`, and with the site now having real pages beyond the map (announcements, events, profiles), the landing page's job at that point is to hand people off to them rather than keep arguing. `PlacesToGo` replaced both. The numbers the diagram was built on are still computed in `gradeStats.ts` and currently go unrendered — Phase 11 either uses them or deletes them.
 - Louvain community detection on the full weighted graph (39 people, 741 pairwise connections, weights 0–5).
 - Visual style: **semi-3D**, not flat-2D-only and not a full walkable 3D "world" (no floors, no walking, no rooms/environment). Real depth, lighting, and a camera that orbits/zooms with limited tilt.
 - Background: warm off-white, not pure white (pure white washes out pastels).
@@ -327,6 +328,7 @@ Verify: edit own bio/photo as one test user, confirm it renders in the main grap
 
 **Phase 5.5 — Landing page below the map** (not in the original roadmap; added Sept 2026)
 Build: the map hero releases into a real page instead of ending at the fold. `src/lib/gradeStats.ts` derives whole-grade figures from `visibleConnections` only; `HowToRead.tsx` decodes color/size/thickness; `GroupCards.tsx` turns each legend swatch into faces; `ThreadsBetween.tsx` is the centrepiece (chord diagram of cross-group friendships plus the headline numbers); `FaceWall.tsx` is all 39 with the map's ego-highlight on hover; `ClosingBand.tsx` + `NameMarquee.tsx` close it out; `SiteFooter.tsx` carries the "the algorithm picked these, not us" note. `Reveal.tsx`/`useInView.ts`/`CountUp.tsx` are the shared scroll choreography, all of it disabled under `prefers-reduced-motion`.
+**Amended Sept 2026**: `ThreadsBetween.tsx`, `FaceWall.tsx` and `CountUp.tsx` were deleted and `PlacesToGo.tsx` (link cards into people/announcements/events/your own page) took their slot — see the changed-note under "Landing page graph" above. `gradeStats.ts` stays, but `crossGroup`, `crossGroupPercent`, `withOutsideFriend`, `possiblePairs` and `separation` now have no reader.
 Key files: `src/lib/gradeStats.ts`, `src/components/home/*`, `src/components/ui/SiteFooter.tsx`, `src/app/page.tsx`.
 Verify: every number on the page recomputes to the same value straight from `data/*.json`; no horizontal overflow at 390px; the reveal animations flatten with reduce-motion on.
 
@@ -374,6 +376,26 @@ Build:
 - Cookie consent: confirm still not needed (only strictly-necessary auth cookies in use); leave a note in the privacy page that adding analytics later would require adding a banner.
 Key files: `src/app/privacy/page.tsx`, `src/app/settings/page.tsx`, `src/lib/deleteAccount.ts`, `public/robots.txt`, `src/app/layout.tsx`.
 Verify: `curl <hosted-url>/robots.txt` shows `Disallow: /`; view-source shows `noindex` on every route; run delete-account against a disposable test account and confirm via Firebase console its data is actually gone; a11y scan has zero critical violations.
+
+**Phase 11 — Visual overhaul** (added Sept 2026, not yet started, no direction locked)
+
+The complaint, in the site owner's words: it "feels basic." That is the whole brief so far. **Do not start building this phase by picking a look and applying it** — the direction gets decided with the owner first, at the start of that session, because this is their grade's site and the taste call is theirs.
+
+What is actually weak right now, to make that conversation concrete:
+- **Every section is the same shape.** `border-t border-line/70` + `py-16 sm:py-24` + `max-w-5xl` + a grid of `rounded-3xl border border-line bg-bg p-6 shadow-sm` cards, five times down the page. Nothing has a different rhythm, width, or weight, so nothing reads as more important than anything else.
+- **The type does one thing.** Two good fonts, but the scale barely moves outside the hero, and Fraunces' variable axes (opsz, SOFT) are loaded and never really used.
+- **Pastels are decoration, not structure.** The seven community colors carry real meaning on the map, then show up as small swatches everywhere else and nothing more.
+- **No imagery or texture anywhere** except user-uploaded profile photos. PLAN.md's own visual notes ask for real photos of the grade in decorative spots; there are none yet.
+- **Dead numbers.** `crossGroup`, `crossGroupPercent`, `withOutsideFriend`, `possiblePairs` and `separation` are still computed in `gradeStats.ts` with no reader since the chord diagram was cut. Give them a home in the new design or delete them; do not leave them.
+- **The login page** is still the plain-text placeholder flagged under Open items below.
+
+Hard limits, so this does not turn into a generic AI-looking site:
+- The locked decisions above still hold: warm off-white, Bricolage + Fraunces, Lucide icons, pastel-per-community, semi-3D map, springy easing, WCAG AA contrast, no dark neon, no walkable 3D, no horror.
+- **Banned outright**: gradient-blob backgrounds, glassmorphism, animated gradient text, floating particles, generic stock 3D shapes, emoji in headings, marketing-landing-page filler ("Built for the future of…"), and any animation that exists only to prove animation exists.
+- **Restraint beats volume.** One strong idea applied consistently across every page beats five effects on the landing page and nothing anywhere else. If a change cannot be explained in one sentence to someone in the grade, it is not the change.
+- Every page ships together. The site currently looks consistent; an overhaul that only lands on `/` would make it look half-finished instead of basic.
+
+Verify: contrast re-measured (the Phase 10 a11y pass is a floor, not a ceiling); `prefers-reduced-motion` still flattens everything; no horizontal overflow at 390px on every route; the map still reads correctly at a glance, since it is the one thing the site exists for.
 
 ---
 

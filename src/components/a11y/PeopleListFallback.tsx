@@ -4,7 +4,7 @@ import { useDeferredValue, useMemo, useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { communityColor } from "@/lib/louvainColors";
-import { communityOf, peopleAlphabetical, visibleNeighbors } from "@/lib/graphData";
+import { communityOf, peopleAlphabetical } from "@/lib/graphData";
 
 /**
  * Keyboard-first way to reach every person without touching the graph.
@@ -44,28 +44,21 @@ export function PeopleListFallback() {
       </p>
 
       <ul className="mt-4 divide-y divide-line/70">
-        {results.map((p) => {
-          const community = communityOf(p.id);
-          const count = visibleNeighbors(p.id).length;
-          return (
-            <li key={p.id}>
-              <Link
-                href={`/profile/${p.id}/`}
-                className="flex items-center gap-3 rounded-lg px-2 py-3 hover:bg-bg-muted focus-visible:bg-bg-muted"
-              >
-                <span
-                  aria-hidden="true"
-                  className="inline-block size-3.5 shrink-0 rounded-full border border-ink/45"
-                  style={{ backgroundColor: communityColor(community) }}
-                />
-                <span className="font-display font-medium">{p.name}</span>
-                <span className="ml-auto text-sm tabular-nums text-ink-muted">
-                  {count} {count === 1 ? "connection" : "connections"}
-                </span>
-              </Link>
-            </li>
-          );
-        })}
+        {results.map((p) => (
+          <li key={p.id}>
+            <Link
+              href={`/profile/${p.id}/`}
+              className="flex items-center gap-3 rounded-lg px-2 py-3 hover:bg-bg-muted focus-visible:bg-bg-muted"
+            >
+              <span
+                aria-hidden="true"
+                className="inline-block size-3.5 shrink-0 rounded-full border border-ink/45"
+                style={{ backgroundColor: communityColor(communityOf(p.id)) }}
+              />
+              <span className="font-display font-medium">{p.name}</span>
+            </Link>
+          </li>
+        ))}
         {results.length === 0 && <li className="py-6 text-ink-muted">No one by that name.</li>}
       </ul>
     </div>

@@ -138,28 +138,3 @@ function computeGradeStats(): GradeStats {
 
 /** Computed once at module load: the roster is static JSON, it never changes at runtime. */
 export const gradeStats: GradeStats = computeGradeStats();
-
-/**
- * Every friendship that crosses a group boundary, collapsed to one row per pair
- * of groups. Feeds the arc diagram.
- */
-export interface GroupLink {
-  from: number;
-  to: number;
-  friendships: number;
-}
-
-export function groupLinks(): GroupLink[] {
-  const counts = new Map<string, GroupLink>();
-  for (const c of visibleConnections) {
-    const ca = communityOf(c.a);
-    const cb = communityOf(c.b);
-    if (ca === cb) continue;
-    const [from, to] = ca < cb ? [ca, cb] : [cb, ca];
-    const key = `${from}-${to}`;
-    const existing = counts.get(key);
-    if (existing) existing.friendships += 1;
-    else counts.set(key, { from, to, friendships: 1 });
-  }
-  return [...counts.values()].sort((a, b) => b.friendships - a.friendships);
-}
