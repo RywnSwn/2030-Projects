@@ -44,6 +44,7 @@ The repo (`/home/user/2030-Projects`) is currently a **100% blank slate**: empty
 - Icons: **Lucide** (or Phosphor) icon library — never hand-drawn/generic AI-style SVG icons.
 - Real photos from the actual grade should be used for decorative content (events, etc.) wherever possible, not stock photography or generic illustrations. Profile pictures are user-uploaded (no sourcing needed, that's on each person via login).
 - Motion: springy easing throughout, subtle cursor parallax on the graph, slow idle drift, nothing snaps abruptly. (Borrowed from studios like Lusion for craft quality only — not their dark aesthetic.)
+- **Page transitions** (not in the original plan; added Sept 2026): every route crossfades into the next via React's `<ViewTransition>` (native View Transitions API integration, see `node_modules/next/dist/docs/01-app/02-guides/view-transitions.md`). `PageTransition.tsx` wraps every `page.tsx`'s content; the CSS lives in `globals.css` under "Page transitions". A plain crossfade + small vertical drift, not a directional slide — this app's nav is flat (no forward/back hierarchy to signal), and it flattens to an instant swap under `prefers-reduced-motion`, same as every other animation on the site.
 
 **Style references gathered during planning** (for whoever builds the visual polish):
 - Anthropic's "Scaling Monosemanticity" interactive UMAP (Adam Pearce) — zoom-into-clusters interaction model.
@@ -60,6 +61,7 @@ The repo (`/home/user/2030-Projects`) is currently a **100% blank slate**: empty
 - **Homework tracker**: **private per student** (decided — each person's homework list is visible only to them, matching how GPA works).
 - **GPA tracker**: private, owner-only, enforced at the database level (not just hidden in UI). This is the most privacy-sensitive data on the site.
 - **Events**: shared/visible to the whole grade. Any authenticated person can create an event; only the creator (or an admin flag) can edit/delete it.
+- **Announcements** (not in the original plan; added Sept 2026): shared/visible to the whole grade, but write access is the opposite of Events — only a site admin (`people.is_admin`) can post, edit or delete one. Everyone signed in can read. See `supabase/migrations/20260919000000_events_and_announcements.sql`.
 - **Lore**: starts empty (a friendly empty state, not an error state), fills in over time as a shared wall any logged-in person can post text/images to.
 
 **Legal & privacy requirements**
@@ -340,10 +342,17 @@ Build: `gpa/page.tsx`, `GpaForm.tsx`, `GpaTable.tsx`, `gpaCalc.ts` (client-side 
 Key files: `src/app/gpa/page.tsx`, `src/components/gpa/*`, `firestore.rules`.
 Verify: enter GPA as one user; confirm a raw SDK read attempt for another `ownerUid` from the browser console errors with a permissions exception.
 
-**Phase 8 — Events page**
-Build: `events/page.tsx`, `EventList.tsx`, `EventForm.tsx` (title, description, start/end, location, optional image + required `imageAlt`); `storage.rules` events path; `events` Firestore rules deployed.
-Key files: `src/app/events/page.tsx`, `src/components/events/*`, `firestore.rules`, `storage.rules`.
-Verify: any logged-in user can create an event, all see it, only the creator can edit/delete it.
+**Phase 8 — Events page (done, Sept 2026, on Supabase not Firestore)**
+Built: `events/page.tsx`, `EventsClient.tsx`, `EventForm.tsx`, `EventCard.tsx` (title, description, start/end, location — no image upload yet, unlike the original Firestore-era plan below). `public.events` table + RLS in `supabase/migrations/20260919000000_events_and_announcements.sql`: any signed-in member can create; the creator **or a site admin** can edit/delete (the admin escape hatch flagged under "Open items" below is now built, via `is_site_admin()`, an O(1) lookup off `people.owner_uid`'s existing unique index — no denormalized doc needed).
+Key files: `src/app/events/page.tsx`, `src/components/events/*`, `src/lib/events.ts`, `supabase/migrations/20260919000000_events_and_announcements.sql`.
+Verify: any signed-in member can create an event, all see it, the creator or an admin can edit/delete it, nobody else can (enforced by RLS, not just hidden buttons).
+
+Original Firestore-era plan (superseded by the above, kept for context): `EventList.tsx`, `EventForm.tsx` with an optional image + required `imageAlt`; `storage.rules` events path; `events` Firestore rules deployed.
+
+**Phase 8.5 — Announcements (not in the original roadmap; added Sept 2026)**
+Build: `announcements/page.tsx`, `AnnouncementsClient.tsx`, `AnnouncementForm.tsx`, `AnnouncementCard.tsx` — title, body, optional pinned flag. `public.announcements` table + RLS in the same migration as Phase 8: everyone signed in reads; only a site admin (`people.is_admin`) can post, edit or delete. The site owner's own row (`id: 'you'`) is set `is_admin = true` by the migration; anyone else who should be able to post announcements needs `is_admin` flipped by hand in the Supabase dashboard.
+Key files: `src/app/announcements/page.tsx`, `src/components/announcements/*`, `src/lib/announcements.ts`.
+Verify: a non-admin sees no "New announcement" button and a direct insert attempt is rejected by RLS; an admin can post, edit, delete and pin; everyone signed in sees the result, pinned ones first.
 
 **Phase 9 — Lore page**
 Build: `lore/page.tsx`, `LoreWall.tsx` (friendly empty-state when no posts exist), `LorePostForm.tsx` (text + optional image/alt); `lorePosts` rules deployed.
@@ -370,7 +379,7 @@ Verify: `curl <hosted-url>/robots.txt` shows `Disallow: /`; view-source shows `n
 
 ## Open items for whoever builds this (not blockers, just flagged)
 
-- **Events edit/delete permissions**: current plan has only the creator able to edit/delete their own event. An `isAdmin` escape-hatch for the site owner to moderate any event was considered but needs an efficient `uid → isAdmin` lookup (a denormalized doc) to add cleanly to rules — treat as a Phase 8+ refinement if moderation becomes necessary, not a v1 requirement.
+- ~~**Events edit/delete permissions**: current plan has only the creator able to edit/delete their own event. An `isAdmin` escape-hatch for the site owner to moderate any event was considered but needs an efficient `uid → isAdmin` lookup (a denormalized doc) to add cleanly to rules — treat as a Phase 8+ refinement if moderation becomes necessary, not a v1 requirement.~~ **Done in Phase 8** via `is_site_admin()`.
 - Optional "like/react" mechanic on lore posts (`reactions` subcollection) is modeled in the data schema but is a stretch item, not required for MVP.
 - **Login page needs a visual cleanup pass**: `src/app/login/LoginClient.tsx` (built in Phase 4) currently just renders plain centered text and a plain rounded button — it doesn't use the site's design tokens (Bricolage Grotesque/Fraunces fonts, warm off-white background, pastel accents) the rest of the app is styled with. Give it a proper pass matching the rest of the site before/alongside whatever phase comes next.
 

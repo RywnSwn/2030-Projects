@@ -21,8 +21,13 @@ originally written for Firebase; the roadmap is unchanged, only the plumbing.
 | 3 | Hover highlight, mobile 2D fallback, `/people` list | done |
 | 4 | Google sign-in via Supabase + account claiming, login gate | done in code, needs the Supabase project (see below) |
 | 5 | Profile photo + bio, owner-only editing, ego mini-graph, photos on the map | done in code, needs the Supabase project (see below) |
-| 6 to 9 | Homework, GPA, events, lore | not started |
+| 6, 7 | Homework, GPA | not started |
+| 8 | Events (any member posts; creator or admin edits/deletes) | done in code, needs the Supabase project (see below) |
+| 8.5 | Announcements (admin-only broadcast) — not in the original plan | done in code, needs the Supabase project (see below) |
+| 9 | Lore | not started |
 | 10 | Privacy page, delete account, a11y audit | partly (noindex + robots.txt already in) |
+
+Page transitions (not a phase — a cross-cutting extra added alongside 8/8.5): every route crossfades into the next via React's `<ViewTransition>`, and flattens to an instant swap under `prefers-reduced-motion`.
 
 Until the two Supabase variables are set at build time the site runs in
 **"sign-in not connected"** mode: nothing is gated, `/login` explains the
@@ -116,9 +121,11 @@ not. Both are fine because the meta tag is what search engines honour.
 ## Hooking up Supabase (turns Phase 4 on)
 
 The project already exists: **"Site of 2030"** (ref `iuloykbgofvdapqtvwkz`, region
-ap-northeast-2), and `supabase/migrations/20260917000000_people.sql` is already
-applied to it, with all 39 roster rows seeded (emails still null). Do not
-create a second Supabase project for this site; reuse that one. What is left:
+ap-northeast-2), and every migration in `supabase/migrations/` — people,
+profile photos, and events/announcements — is already applied to it, with all
+39 roster rows seeded (emails still null) and the site owner's own row
+(`id: 'you'`) set `is_admin = true`. Do not create a second Supabase project
+for this site; reuse that one. What is left:
 
 1. In [the Supabase dashboard](https://supabase.com/dashboard/project/iuloykbgofvdapqtvwkz),
    **Authentication > Providers**, enable Google. Use your own Google Cloud

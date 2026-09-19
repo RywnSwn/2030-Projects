@@ -14,7 +14,7 @@ import type { Person } from "@/lib/types";
 // WebGL stays out of the static prerender, same as the main map.
 const EgoMiniGraph = dynamic(() => import("./EgoMiniGraph").then((m) => m.EgoMiniGraph), { ssr: false });
 
-const BLANK: LiveProfile = { bio: "", photoPath: null, photoURL: null, ownerUid: null };
+const BLANK: LiveProfile = { bio: "", photoPath: null, photoURL: null, ownerUid: null, isAdmin: false };
 
 /**
  * The live half of a profile page: photo, bio, the owner's edit form, and the

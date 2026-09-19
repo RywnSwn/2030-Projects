@@ -38,3 +38,29 @@ export interface PersonRow {
   is_admin: boolean;
   updated_at: string;
 }
+
+/** Row shape of public.events (see supabase/migrations). */
+export interface EventRow {
+  id: string;
+  title: string;
+  description: string;
+  location: string;
+  start_at: string;
+  end_at: string | null;
+  created_by_uid: string;
+  created_by_person_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Row shape of public.announcements (see supabase/migrations). */
+export interface AnnouncementRow {
+  id: string;
+  title: string;
+  body: string;
+  pinned: boolean;
+  created_by_uid: string;
+  created_by_person_id: string;
+  created_at: string;
+  updated_at: string;
+}

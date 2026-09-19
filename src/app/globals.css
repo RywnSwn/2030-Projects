@@ -130,6 +130,50 @@ h3,
   }
 }
 
+/* --- Page transitions (React <ViewTransition>, see PageTransition.tsx) --- */
+
+::view-transition-old(.page-exit),
+::view-transition-new(.page-enter) {
+  animation-duration: 220ms;
+  animation-timing-function: ease-out;
+}
+
+::view-transition-old(.page-exit) {
+  animation-name: page-fade-out;
+}
+
+::view-transition-new(.page-enter) {
+  animation-name: page-fade-in;
+}
+
+@keyframes page-fade-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* Without this the transition overlay eats clicks for its whole duration. */
+::view-transition {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
 /* --- Scrollbar --- */
 
 /*

@@ -33,6 +33,7 @@ export interface LiveProfile {
   /** Short-lived signed link for `photoPath`, or null when there is no photo. */
   photoURL: string | null;
   ownerUid: string | null;
+  isAdmin: boolean;
 }
 
 export type ProfileMap = Record<string, LiveProfile>;
@@ -42,11 +43,12 @@ interface PeopleSelectRow {
   bio: string | null;
   photo_path: string | null;
   owner_uid: string | null;
+  is_admin: boolean | null;
 }
 
 async function fetchProfiles(): Promise<ProfileMap> {
   const supabase = getSupabase();
-  const { data, error } = await supabase.from("people").select("id, bio, photo_path, owner_uid");
+  const { data, error } = await supabase.from("people").select("id, bio, photo_path, owner_uid, is_admin");
   if (error) throw error;
 
   const rows = (data ?? []) as PeopleSelectRow[];
@@ -60,6 +62,7 @@ async function fetchProfiles(): Promise<ProfileMap> {
       photoPath: row.photo_path,
       photoURL: row.photo_path ? (signed[row.photo_path] ?? null) : null,
       ownerUid: row.owner_uid,
+      isAdmin: row.is_admin ?? false,
     };
   }
   return profiles;
@@ -146,6 +149,14 @@ export function useProfiles(): UseProfilesResult {
   }, [profiles]);
 
   return { profiles, photos, loading, error, refresh };
+}
+
+/** True once the signed-in person's own people row loads with is_admin = true. */
+export function useIsAdmin(): boolean {
+  const { state } = useAuth();
+  const { profiles } = useProfiles();
+  if (state.status !== "signed-in" || !state.person) return false;
+  return profiles[state.person.id]?.isAdmin ?? false;
 }
 
 export function describePhotoProblem(file: File): string | null {

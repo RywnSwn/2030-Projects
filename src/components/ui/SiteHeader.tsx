@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, Waypoints } from "lucide-react";
+import { CalendarDays, Megaphone, Users, Waypoints } from "lucide-react";
 import clsx from "clsx";
 import { AccountMenu } from "@/components/auth/AccountMenu";
 
 const links = [
   { href: "/", label: "Map", icon: Waypoints },
   { href: "/people/", label: "People", icon: Users },
+  { href: "/announcements/", label: "Announcements", icon: Megaphone },
+  { href: "/events/", label: "Events", icon: CalendarDays },
 ];
 
 export function SiteHeader() {
@@ -25,8 +27,8 @@ export function SiteHeader() {
         >
           Class of 2030
         </Link>
-        <div className="flex items-center gap-2">
-          <ul className="flex items-center gap-1">
+        <div className="flex items-center gap-1 sm:gap-2">
+          <ul className="flex items-center gap-0.5 sm:gap-1">
             {links.map(({ href, label, icon: Icon }) => {
               const active =
                 href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -35,15 +37,16 @@ export function SiteHeader() {
                   <Link
                     href={href}
                     aria-current={active ? "page" : undefined}
+                    aria-label={label}
                     className={clsx(
-                      "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-display text-sm font-medium transition-colors",
+                      "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 font-display text-sm font-medium transition-colors sm:px-3",
                       active
                         ? "bg-ink text-bg"
                         : "text-ink-muted hover:bg-bg-muted hover:text-ink",
                     )}
                   >
                     <Icon size={16} aria-hidden="true" />
-                    {label}
+                    <span className="hidden sm:inline">{label}</span>
                   </Link>
                 </li>
               );

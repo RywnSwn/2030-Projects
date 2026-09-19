@@ -4,6 +4,7 @@ import { GroupCards } from "@/components/home/GroupCards";
 import { ThreadsBetween } from "@/components/home/ThreadsBetween";
 import { FaceWall } from "@/components/home/FaceWall";
 import { ClosingBand } from "@/components/home/ClosingBand";
+import { PageTransition } from "@/components/ui/PageTransition";
 
 /**
  * The landing page. The map is the front door; everything under it is the
@@ -14,13 +15,13 @@ import { ClosingBand } from "@/components/home/ClosingBand";
  */
 export default function HomePage() {
   return (
-    <>
+    <PageTransition>
       <WelcomeMap />
       <HowToRead />
       <GroupCards />
       <ThreadsBetween />
       <FaceWall />
       <ClosingBand />
-    </>
+    </PageTransition>
   );
 }
